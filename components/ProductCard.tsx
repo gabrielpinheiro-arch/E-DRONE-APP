@@ -4,19 +4,23 @@ import { Product } from '../types';
 
 interface ProductCardProps {
   product: Product;
+  onAddToCart: (product: Product, quantity: number) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
 
   const handleQuantityChange = (amount: number) => {
     setQuantity(prev => Math.max(1, prev + amount));
   };
 
-  const handleAddToCart = () => {
-    // Em um aplicativo real, isso enviaria uma ação para um estado global (por exemplo, Redux, Context)
-    console.log(`Adicionado ao carrinho: ${quantity} x ${product.name}`);
-    alert(`${quantity} x ${product.name} adicionado ao carrinho!`);
+  const handleAddToCartClick = () => {
+    onAddToCart(product, quantity);
+    setIsAdded(true);
+    setTimeout(() => {
+        setIsAdded(false);
+    }, 2000);
   };
 
   return (
@@ -57,10 +61,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Botão Adicionar ao Carrinho */}
         <button
-          onClick={handleAddToCart}
-          className="w-full bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50 transition-colors duration-300 mt-auto"
+          onClick={handleAddToCartClick}
+          disabled={isAdded}
+          className={`w-full text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300 mt-auto ${
+            isAdded
+              ? 'bg-green-500 cursor-not-allowed'
+              : 'bg-cyan-500 hover:bg-cyan-600 focus:ring-cyan-500'
+          }`}
         >
-          Adicionar ao carrinho
+          {isAdded ? 'Adicionado!' : 'Adicionar ao carrinho'}
         </button>
       </div>
     </div>

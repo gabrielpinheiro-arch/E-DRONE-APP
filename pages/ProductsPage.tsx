@@ -1,8 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, PRODUCTS } from '../constants';
-import { ProductCategory } from '../types';
+import { ProductCategory, Product, CartItem } from '../types';
 import ProductCard from '../components/ProductCard';
+import CartDrawer from '../components/CartDrawer';
 
 interface ProductsPageProps {
   onLogout: () => void;
@@ -10,6 +11,32 @@ interface ProductsPageProps {
 
 const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout }) => {
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'All'>('All');
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const handleAddToCart = (product: Product, quantity: number) => {
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item.id === product.id);
+      if (existingItem) {
+        return prevCart.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+      return [...prevCart, { 
+        id: product.id, 
+        name: product.name, 
+        price: product.price, 
+        imageUrl: product.imageUrl, 
+        quantity 
+      }];
+    });
+  };
+
+  const cartItemCount = useMemo(() => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  }, [cart]);
 
   const filteredProducts = useMemo(() => {
     if (selectedCategory === 'All') {
@@ -39,12 +66,28 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout }) => {
       <header className="bg-gray-800/50 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
           <h1 className="text-2xl font-bold text-white">E-DRONE</h1>
-          <button
-            onClick={onLogout}
-            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300"
-          >
-            Sair
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative text-gray-300 hover:text-white transition-colors"
+              aria-label={`Ver carrinho, ${cartItemCount} itens`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {cartItemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-cyan-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={onLogout}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300"
+            >
+              Sair
+            </button>
+          </div>
         </nav>
       </header>
 
@@ -61,10 +104,17 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout }) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
           ))}
         </div>
       </main>
+      
+      <CartDrawer 
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={cart}
+        onUpdateCart={setCart}
+      />
     </div>
   );
 };
