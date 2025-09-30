@@ -1,9 +1,9 @@
-
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, PRODUCTS } from '../constants';
 import { ProductCategory, Product, CartItem, Order } from '../types';
 import ProductCard from '../components/ProductCard';
 import CartDrawer from '../components/CartDrawer';
+import ThemeToggleButton from '../components/ThemeToggleButton';
 
 interface ProductsPageProps {
   onLogout: () => void;
@@ -74,7 +74,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
           isActive
             ? 'bg-cyan-500 text-white shadow-md'
-            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
         }`}
       >
         {category}
@@ -83,14 +83,15 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
   };
   
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <header className="bg-gray-800/50 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
+    <div className="min-h-screen bg-transparent">
+      <header className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
-          <h1 className="text-2xl font-bold text-white">E-DRONE</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">E-DRONE</h1>
           <div className="flex items-center space-x-4">
+            <ThemeToggleButton />
              <button
               onClick={onNavigateToHistory}
-              className="text-gray-300 hover:text-white transition-colors"
+              className="text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               aria-label="Ver histórico de compras"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,7 +100,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
             </button>
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative text-gray-300 hover:text-white transition-colors"
+              className="relative text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               aria-label={`Ver carrinho, ${cartItemCount} itens`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,7 +125,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
             <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Catálogo de Produtos</h2>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-400">Explore nossa seleção de produtos entregues por drones.</p>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-500 dark:text-gray-400">Explore nossa seleção de produtos entregues por drones.</p>
         </div>
 
         <div className="flex justify-center flex-wrap gap-2 sm:gap-4 mb-10">
