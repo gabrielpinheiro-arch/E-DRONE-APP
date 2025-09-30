@@ -2,6 +2,8 @@
 export enum Page {
   Login = 'LOGIN',
   Signup = 'SIGNUP',
+  Products = 'PRODUCTS',
+  History = 'HISTORY',
 }
 
 export enum ProductCategory {
@@ -25,4 +27,13 @@ export interface CartItem {
   price: number;
   imageUrl: string;
   quantity: number;
+}
+
+export interface OrderItem extends CartItem {}
+
+export interface Order {
+  id: string;
+  date: string;
+  items: OrderItem[];
+  total: number;
 }

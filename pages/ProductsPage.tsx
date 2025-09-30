@@ -1,15 +1,16 @@
 
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, PRODUCTS } from '../constants';
-import { ProductCategory, Product, CartItem } from '../types';
+import { ProductCategory, Product, CartItem, Order } from '../types';
 import ProductCard from '../components/ProductCard';
 import CartDrawer from '../components/CartDrawer';
 
 interface ProductsPageProps {
   onLogout: () => void;
+  onNavigateToHistory: () => void;
 }
 
-const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout }) => {
+const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHistory }) => {
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'All'>('All');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -32,6 +33,26 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout }) => {
         quantity 
       }];
     });
+  };
+
+  const handleCheckout = () => {
+    if (cart.length === 0) return;
+
+    const newOrder: Order = {
+      id: `order-${Date.now()}`,
+      date: new Date().toISOString(),
+      items: cart,
+      total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
+    };
+
+    const existingOrdersString = localStorage.getItem('e-drone-orders');
+    const existingOrders: Order[] = existingOrdersString ? JSON.parse(existingOrdersString) : [];
+    
+    localStorage.setItem('e-drone-orders', JSON.stringify([...existingOrders, newOrder]));
+
+    setCart([]);
+    setIsCartOpen(false);
+    alert('Compra realizada com sucesso! Você pode ver seus pedidos no histórico.');
   };
 
   const cartItemCount = useMemo(() => {
@@ -67,6 +88,15 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout }) => {
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
           <h1 className="text-2xl font-bold text-white">E-DRONE</h1>
           <div className="flex items-center space-x-4">
+             <button
+              onClick={onNavigateToHistory}
+              className="text-gray-300 hover:text-white transition-colors"
+              aria-label="Ver histórico de compras"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+            </button>
             <button
               onClick={() => setIsCartOpen(true)}
               className="relative text-gray-300 hover:text-white transition-colors"
@@ -114,6 +144,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout }) => {
         onClose={() => setIsCartOpen(false)}
         items={cart}
         onUpdateCart={setCart}
+        onCheckout={handleCheckout}
       />
     </div>
   );

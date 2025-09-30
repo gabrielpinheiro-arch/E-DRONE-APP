@@ -29,7 +29,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigateToSignu
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-md bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl shadow-2xl shadow-cyan-500/10">
         <h1 className="text-4xl font-bold text-center text-white mb-2">E-DRONE</h1>
-        <p className="text-center text-gray-400 mb-8">Entrega futurista na sua porta.</p>
+        <p className="text-center text-gray-400 mb-8">O primeiro serviço de delivery por drones do Brasil!</p>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" label="Email" />

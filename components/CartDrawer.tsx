@@ -7,9 +7,10 @@ interface CartDrawerProps {
   onClose: () => void;
   items: CartItem[];
   onUpdateCart: (newCart: CartItem[]) => void;
+  onCheckout: () => void;
 }
 
-const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, items, onUpdateCart }) => {
+const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, items, onUpdateCart, onCheckout }) => {
   const handleQuantityChange = (itemId: number, newQuantity: number) => {
     if (newQuantity < 1) {
       handleRemoveItem(itemId);
@@ -100,7 +101,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, items, onUpdat
                 <span className="font-medium text-gray-300">Subtotal:</span>
                 <span className="font-bold text-cyan-400">R$ {subtotal.toFixed(2).replace('.', ',')}</span>
               </div>
-              <button className="w-full bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50 transition-colors duration-300">
+              <button
+                onClick={onCheckout}
+                className="w-full bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50 transition-colors duration-300"
+              >
                 Finalizar Compra
               </button>
             </footer>

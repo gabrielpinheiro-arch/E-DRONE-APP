@@ -4,41 +4,46 @@ import { Page } from './types';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ProductsPage from './pages/ProductsPage';
+import HistoryPage from './pages/HistoryPage';
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<Page>(Page.Login);
 
   useEffect(() => {
     const loggedInStatus = localStorage.getItem('e-drone-auth');
     if (loggedInStatus === 'true') {
-      setIsAuthenticated(true);
+      setCurrentPage(Page.Products);
     }
   }, []);
 
   const handleLoginSuccess = () => {
     localStorage.setItem('e-drone-auth', 'true');
-    setIsAuthenticated(true);
+    setCurrentPage(Page.Products);
   };
 
   const handleSignupSuccess = () => {
-    // Automatically log in user after successful signup
     localStorage.setItem('e-drone-auth', 'true');
-    setIsAuthenticated(true);
+    setCurrentPage(Page.Products);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('e-drone-auth');
-    setIsAuthenticated(false);
     setCurrentPage(Page.Login);
   };
   
   const renderPage = () => {
-    if (isAuthenticated) {
-      return <ProductsPage onLogout={handleLogout} />;
-    }
-
     switch (currentPage) {
+      case Page.Products:
+        return (
+          <ProductsPage
+            onLogout={handleLogout}
+            onNavigateToHistory={() => setCurrentPage(Page.History)}
+          />
+        );
+      case Page.History:
+        return (
+          <HistoryPage onNavigateBack={() => setCurrentPage(Page.Products)} />
+        );
       case Page.Signup:
         return (
           <SignupPage
