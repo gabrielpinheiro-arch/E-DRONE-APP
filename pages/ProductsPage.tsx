@@ -4,6 +4,7 @@ import { ProductCategory, Product, CartItem, Order } from '../types';
 import ProductCard from '../components/ProductCard';
 import CartDrawer from '../components/CartDrawer';
 import ThemeToggleButton from '../components/ThemeToggleButton';
+import Notification from '../components/Notification';
 
 interface ProductsPageProps {
   onLogout: () => void;
@@ -14,6 +15,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'All'>('All');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
 
   const handleAddToCart = (product: Product, quantity: number) => {
     setCart(prevCart => {
@@ -33,6 +35,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
         quantity 
       }];
     });
+    setNotification(`${product.name} adicionado ao carrinho!`);
   };
 
   const handleCheckout = () => {
@@ -52,7 +55,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
 
     setCart([]);
     setIsCartOpen(false);
-    alert('Compra realizada com sucesso! Você pode ver seus pedidos no histórico.');
+    setNotification('Compra realizada com sucesso! Você pode ver seus pedidos no histórico.');
   };
 
   const cartItemCount = useMemo(() => {
@@ -84,6 +87,13 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
   
   return (
     <div className="min-h-screen bg-transparent">
+      {notification && (
+        <Notification 
+          message={notification} 
+          type="success" 
+          onClose={() => setNotification(null)} 
+        />
+      )}
       <header className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">E-DRONE</h1>
