@@ -13,6 +13,7 @@ interface ProductsPageProps {
 
 const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHistory }) => {
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'All'>('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
@@ -63,11 +64,21 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
   }, [cart]);
 
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === 'All') {
-      return PRODUCTS;
+    let result = PRODUCTS;
+
+    if (selectedCategory !== 'All') {
+      result = result.filter(product => product.category === selectedCategory);
     }
-    return PRODUCTS.filter(product => product.category === selectedCategory);
-  }, [selectedCategory]);
+
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(product => 
+        product.name.toLowerCase().includes(query)
+      );
+    }
+
+    return result;
+  }, [selectedCategory, searchQuery]);
 
   const FilterButton: React.FC<{ category: ProductCategory | 'All' }> = ({ category }) => {
     const isActive = selectedCategory === category;
@@ -138,16 +149,38 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onLogout, onNavigateToHisto
             <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-500 dark:text-gray-400">Explore nossa seleção de produtos entregues por drones.</p>
         </div>
 
+        {/* Search Bar */}
+        <div className="max-w-md mx-auto mb-8 relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm transition duration-150 ease-in-out shadow-sm"
+            placeholder="Buscar produtos..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
         <div className="flex justify-center flex-wrap gap-2 sm:gap-4 mb-10">
           <FilterButton category="All" />
           {CATEGORIES.map(cat => <FilterButton key={cat} category={cat} />)}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-          ))}
-        </div>
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-10">
+             <p className="text-xl text-gray-500 dark:text-gray-400">Nenhum produto encontrado para sua busca.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredProducts.map(product => (
+              <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+            ))}
+          </div>
+        )}
       </main>
       
       <CartDrawer 
